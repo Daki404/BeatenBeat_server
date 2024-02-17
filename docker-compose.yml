@@ -8,6 +8,7 @@ services:
       - "80:80"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./web:/opt/web
     depends_on:
       - application
     networks:

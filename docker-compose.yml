@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+  web:
+    container_name: nginx
+    image: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - application
+    networks:
+      - inner_network
+
+  database:
+    container_name: mysql
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_ROOT_HOST: ${MYSQL_ROOT_HOST}
+      TZ: Asia/Seoul
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    volumes:
+      - /mysql/conf.d:/etc/mysql/conf.d
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    command:
+      - "--character-set-server=utf8mb4"
+      - "--collation-server=utf8mb4_unicode_ci"
+    networks:
+      - inner_network
+
+  application:
+    container_name: spring
+    restart: on-failure
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    depends_on:
+      - database
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/beat?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "8080:8080"
+
+    networks:
+      - inner_network
+
+networks:
+  inner_network:

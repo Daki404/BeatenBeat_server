@@ -10,7 +10,6 @@ public class MainController {
 
     @GetMapping("/")
     public String redirectMain() {
-        return "redirect:http://localhost:80";
-        //return "redirect:http://www.time-traveler.site";
+        return "redirect:http://beaten-beat.com";
     }
 }

@@ -52,6 +52,9 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOrigin("http://localhost");
+        configuration.addAllowedOrigin("https://beaten-beat.com");
+        configuration.addAllowedOrigin("http://beaten-beat.com");
+
 
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");

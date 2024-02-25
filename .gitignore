@@ -1,8 +1,9 @@
 ### My private data###
 application-oauth.properties
-application.yml
+application*.yml
 
 .env
+
 
 HELP.md
 .gradle

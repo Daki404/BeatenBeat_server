@@ -33,6 +33,25 @@ dependencies {
 	runtimeOnly 'com.mysql:mysql-connector-j'
 }
 
+sourceSets {
+	def profile = project.hasProperty('profile') ? project.getProperty('profile') : 'local'
+	println "profile  : $profile"
+
+	main {
+		java {
+			srcDirs "src/main/java"
+		}
+		resources {
+			srcDirs "src/main/resources", "src/main/resources-env/${profile}"
+		}
+	}
+}
+
+tasks {
+	processResources {
+		duplicatesStrategy = org.gradle.api.file.DuplicatesStrategy.INCLUDE
+	}
+}
 
 tasks.named('test') {
 	useJUnitPlatform()

@@ -34,11 +34,10 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
                 .authorizeHttpRequests((Requests) -> {
-                    /*
                     Requests.requestMatchers(
-                            "/api/v1/user/**"
+                            "/api/v1/groups/**"
                     ).authenticated();
-                     */
+
                     Requests.anyRequest().permitAll();
                 })
 

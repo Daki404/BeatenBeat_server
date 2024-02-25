@@ -2,10 +2,13 @@ package daki.BeatenBeat.domain.group;
 
 import daki.BeatenBeat.domain.user.User;
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.*;
 
 @Entity
 @Table(name = "group_members")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class GroupMember {
     @Id

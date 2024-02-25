@@ -3,7 +3,7 @@ application-oauth.properties
 application*.yml
 
 .env
-
+web/
 
 HELP.md
 .gradle

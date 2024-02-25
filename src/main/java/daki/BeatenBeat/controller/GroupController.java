@@ -37,4 +37,8 @@ public class GroupController {
         return groupService.updateGroup(id, body.get("name"), body.get("url"));
     }
 
+    @PostMapping("/{group_id}")
+    public ResponseEntity<Object> inviteUser(@PathVariable("group_id") Long id,  @RequestBody Map<String, String> body) {
+        return groupService.inviteUser(id, body.get("nickName"));
+    }
 }

@@ -6,7 +6,7 @@ import daki.BeatenBeat.domain.user.User;
 import daki.BeatenBeat.dto.GroupListResponseDTO;
 import daki.BeatenBeat.repository.GroupMemberRepository;
 import daki.BeatenBeat.repository.GroupRepository;
-import daki.BeatenBeat.repository.ImageRepository;
+import daki.BeatenBeat.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -23,7 +23,7 @@ import java.util.Optional;
 public class GroupService {
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
-    private final ImageRepository imageRepository;
+    private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
     public GroupListResponseDTO getGroup(User user) {
@@ -80,6 +80,24 @@ public class GroupService {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to update group");
+    }
+
+    @Transactional
+    public ResponseEntity<Object> inviteUser(Long id, String nickName) {
+        Optional<User> optionUser = userRepository.findByNickName(nickName);
+        Optional<Group> optionGroup = groupRepository.findById(id);
+
+        if(optionUser.isEmpty() || optionGroup.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to invite User");
+        }
+
+        GroupMember groupMember = GroupMember.builder()
+                .user(optionUser.get())
+                .group(optionGroup.get())
+                .build();
+
+        groupMemberRepository.save(groupMember);
+        return ResponseEntity.ok().build();
     }
 
 }

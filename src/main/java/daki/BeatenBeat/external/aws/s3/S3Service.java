@@ -19,8 +19,8 @@ public class S3Service {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    public String getImageUrl(User user){
-        return amazonS3.getUrl(bucket, user.getId()).toString();
+    public String getImageUrl(String fileName){
+        return amazonS3.getUrl(bucket, fileName).toString();
     }
 
     public String saveImage(MultipartFile multipartFile, User user) throws IOException{
@@ -31,7 +31,16 @@ public class S3Service {
         metadata.setContentType(multipartFile.getContentType());
 
         amazonS3.putObject(bucket, fileName, multipartFile.getInputStream(), metadata);
-        return getImageUrl(user);
+        return getImageUrl(fileName);
+    }
+
+    public String saveGroupImage(MultipartFile multipartFile, String groupName) throws IOException{
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(multipartFile.getSize());
+        metadata.setContentType(multipartFile.getContentType());
+
+        amazonS3.putObject(bucket, groupName, multipartFile.getInputStream(), metadata);
+        return getImageUrl(groupName);
     }
 
 }

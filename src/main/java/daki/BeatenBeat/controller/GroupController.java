@@ -3,10 +3,12 @@ package daki.BeatenBeat.controller;
 import daki.BeatenBeat.annotation.ReqUser;
 import daki.BeatenBeat.domain.user.User;
 import daki.BeatenBeat.dto.GroupListResponseDTO;
+import daki.BeatenBeat.dto.GroupUsersReponseDTO;
 import daki.BeatenBeat.service.GroupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
@@ -23,8 +25,15 @@ public class GroupController {
     }
 
     @PostMapping("")
-    public ResponseEntity<Object> makeGroup(@ReqUser User user, @RequestBody Map<String, String> body) {
-        return groupService.buildGroup(user, body.get("name"));
+    public ResponseEntity<Object> makeGroup(@ReqUser User user,
+                                            @RequestPart("name")String name,
+                                            @RequestPart("file")MultipartFile file) {
+        return groupService.buildGroup(user, name, file);
+    }
+
+    @GetMapping("/{group_id}")
+    public GroupUsersReponseDTO getUsers(@PathVariable("group_id") Long id) {
+        return groupService.getUsers(id);
     }
 
     @DeleteMapping("/{group_id}")

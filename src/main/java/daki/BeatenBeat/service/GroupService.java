@@ -4,16 +4,22 @@ import daki.BeatenBeat.domain.group.Group;
 import daki.BeatenBeat.domain.group.GroupMember;
 import daki.BeatenBeat.domain.user.User;
 import daki.BeatenBeat.dto.GroupListResponseDTO;
+import daki.BeatenBeat.dto.GroupUsersReponseDTO;
+import daki.BeatenBeat.external.aws.s3.S3Service;
 import daki.BeatenBeat.repository.GroupMemberRepository;
 import daki.BeatenBeat.repository.GroupRepository;
 import daki.BeatenBeat.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +30,9 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
     private final UserRepository userRepository;
+
+    @Autowired
+    private S3Service s3Service;
 
     @Transactional(readOnly = true)
     public GroupListResponseDTO getGroup(User user) {
@@ -42,15 +51,22 @@ public class GroupService {
     }
 
     @Transactional
-    public ResponseEntity<Object> buildGroup(User user, String groupName) {
-        Group group = Group.builder()
-                .name(groupName)
-                .leader(user)
-                .build();
+    public ResponseEntity<Object> buildGroup(User user, String groupName, MultipartFile file) {
+        try{
+            String imageUrl = s3Service.saveGroupImage(file, groupName);
 
-        group = groupRepository.save(group);
-        if (group.getId() != null) {
-            return ResponseEntity.ok().build();
+            Group group = Group.builder()
+                    .name(groupName)
+                    .leader(user)
+                    .url(imageUrl)
+                    .build();
+
+            group = groupRepository.save(group);
+            if (group.getId() != null) {
+                return ResponseEntity.ok().build();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
@@ -98,6 +114,26 @@ public class GroupService {
 
         groupMemberRepository.save(groupMember);
         return ResponseEntity.ok().build();
+    }
+
+    public GroupUsersReponseDTO getUsers(Long id) {
+        Optional<Group> optionalGroup = groupRepository.findById(id);
+
+        if (optionalGroup.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+        Group group = optionalGroup.get();
+
+        List<GroupMember> GroupMemberList = groupMemberRepository.findAllByGroup(group);
+        List<String> memeberIdList = new ArrayList<>();
+
+        for (GroupMember groupMember : GroupMemberList) {
+            User user = groupMember.getUser();
+            String userName = user.getNickName();
+            memeberIdList.add(userName);
+        }
+
+        return GroupUsersReponseDTO.toDTO(group, memeberIdList);
     }
 
 }

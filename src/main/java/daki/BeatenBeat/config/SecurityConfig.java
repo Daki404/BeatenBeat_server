@@ -15,6 +15,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.List;
+
 @Configuration
 @RequiredArgsConstructor
 @EnableMethodSecurity
@@ -53,10 +55,11 @@ public class SecurityConfig {
         configuration.addAllowedOrigin("http://localhost");
         configuration.addAllowedOrigin("https://beaten-beat.com");
         configuration.addAllowedOrigin("http://beaten-beat.com");
+        configuration.addAllowedOrigin("https://youtube.com");
 
 
         configuration.addAllowedHeader("*");
-        configuration.addAllowedMethod("*");
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
